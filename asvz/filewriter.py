@@ -1,28 +1,35 @@
 #
 #   Manege-Tool
-#   Version 2
-#   Author T.Wisotzki 2019
+#   Version 4.1.0 / 30.07.2022
+#   Author D. Meier 2022 + 2021 & T.Wisotzki 2019
 #
 
-from docx import Document
-from docx.shared import Inches
-from docx.enum.section import WD_ORIENT
+from docx import Document # type: ignore
+from docx.shared import Inches # type: ignore
+from docx.enum.section import WD_ORIENT # type: ignore
 from docx.shared import Pt
 
 
 def Out(Trainingsday, out_dir):
-    Columns = ['Datum', 'Aufwärmen', 'Lektion', 'Geräteturnen', 'Trampolin', 'Akrobatik']
+    Columns = ['Datum', 'Einturnen', 'Lektion', 'Geräteturnen',
+               'Trampolin', 'Akrobatik']
     day = Trainingsday.name
     if day.__contains__("Montag"):
-        Columns.extend(['Vertikaltuch', 'Slackline', 'Exra Thema'])
+        # pre Covid-19
+        # Columns.extend(['Vertikaltuch', 'Slacklinen', 'Exra Thema'])
+        Columns.extend(['Vertikaltuch', 'Slacklinen'])
         day = "Montag"
         ort = "19:15 - 21:40 Zentrum"
     elif day.__contains__("Mittwoch"):
-        Columns.extend(['Jonglieren', 'Slackline', 'Akro Bungee', 'Parkour'])
+        # pre Covid-19
+        # Columns.extend(['Jonglieren', 'Slacklinen', 'Parkour',
+        #                 'Akro Bungee'])
+        Columns.extend(['Jonglieren', 'Slacklinen'])
         day = "Mittwoch"
         ort = "19:15 - 21:40 Hönggerberg"
     elif day.__contains__("Donnerstag"):
-        Columns.extend(['Jonglieren', 'Breakdance'])
+        # Columns.extend(['Jonglieren', 'Breakdance'])   # pre Covid-19
+        Columns.append('Breakdance')
         day = "Donnerstag"
         ort = "19:30 - 21:40 PHZ"
     else:
@@ -55,22 +62,29 @@ def Out(Trainingsday, out_dir):
     for training in Trainingsday.trainings:
         row_cells = table.add_row().cells
         row_cells[0].text = training.date
-        row_cells[3].text = training.GETU
-        row_cells[4].text = training.TRA
-        row_cells[5].text = training.AKRO
+        row_cells[3].text = "".join(training.GETU)
+        row_cells[4].text = "".join(training.TRA)
+        row_cells[5].text = "".join(training.AKRO)
         if day == "Montag":
-            row_cells[6].text = training.VERT
-            row_cells[7].text = training.SLACK
-            row_cells[9].text = training.CAN
+            row_cells[6].text = "".join(training.VERT)
+            row_cells[7].text = "".join(training.SLACK)
+            row_cells[8].text = "".join(training.CAN)
+            # pre Covid-19 version
+            # row_cells[9].text = "".join(training.CAN)
         elif day == "Mittwoch":
-            row_cells[6].text = training.JONG
-            row_cells[7].text = training.SLACK
-            row_cells[9].text = training.PARC
-            row_cells[10].text = training.CAN
+            row_cells[6].text = "".join(training.JONG)
+            row_cells[7].text = "".join(training.SLACK)
+            row_cells[8].text = "".join(training.CAN)
+            # pre Covid-19 version
+            # row_cells[8].text = "".join(training.PARC)
+            # row_cells[10].text = "".join(training.CAN)
         elif day == "Donnerstag":
-            row_cells[6].text = training.JONG
-            row_cells[7].text = training.BREAK
-            row_cells[8].text = training.CAN
+            row_cells[6].text = "".join(training.BREAK)
+            row_cells[7].text = "".join(training.CAN)
+            # pre Covid-19 version
+            # row_cells[6].text = "".join(training.JONG)
+            # row_cells[7].text = "".join(training.BREAK)
+            # row_cells[8].text = "".join(training.CAN)
     for row in table.rows:
         for cell in row.cells:
             paragraphs = cell.paragraphs
@@ -89,6 +103,9 @@ def Out(Trainingsday, out_dir):
     nam = "prov_Einteilung_" + day + ".docx"
     try:
         document.save(out_dir + nam)
-    except Exception as e:
-        print("  ERROR: specified output directory is not valid")
-        exit()
+    except PermissionError:
+        print('--------------------------------------------------------------')
+        print('PermissionError !!!')
+        print('File: ' + out_dir + nam)
+        print('file is not closed or specified output directory is not valid')
+        print('--------------------------------------------------------------')
