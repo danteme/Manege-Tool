@@ -2,8 +2,8 @@
 #
 #
 
-# directory containing doodle file(s)
-doodles/
+# directory containing assignment polls, nuudel files
+polls/
 
-# direcotry to put output data
-./
+# direcotry to put created assignment templates
+assignments/
